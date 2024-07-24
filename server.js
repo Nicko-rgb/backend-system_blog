@@ -42,23 +42,25 @@ const publicationSchema = new mongoose.Schema({
         filename: { type: String },
         path: { type: String }
     },
-    createdAt: { type: Date, default: Date.now },
-    createdAtDate: { type: Date, default: Date.now },
+    createdAt: { type: Date, default: Date.now }, // UTC
+    createdAtDate: { type: Date, default: Date.now }, // UTC
     createdAtTime: {
-        type: String, default: () => {
+        type: String,
+        default: () => {
             const date = new Date();
-            return `${date.getHours()}:${date.getMinutes()}:${date.getSeconds()}`;
+            return `${date.getUTCHours()}:${date.getUTCMinutes()}:${date.getUTCSeconds()}`;
         }
     },
     likes: { type: Number, default: 0 },
     comentarios: [
         {
-            usuario: { type: String, required: true }, // Cambiar de mongoose.Schema.Types.ObjectId a String
+            usuario: { type: String, required: true },
             texto: { type: String, required: true },
-            fecha: { type: Date, default: Date.now }
+            fecha: { type: Date, default: Date.now } // UTC
         }
     ]
 });
+
 const Publicacion = mongoose.model('Publicacion', publicationSchema);
 
 
