@@ -5,16 +5,18 @@ const multer = require('multer');
 const cors = require('cors');
 const bcrypt = require('bcryptjs');
 const path = require('path');
+const { type } = require('os');
 
 // Configurar el middleware para servir archivos estáticos
 app.use('/uploads', express.static(path.join(__dirname, 'uploads')));
+app.use('/uploads', express.static('uploads'));
 
 // Conectar a la base de datos MongoDB
 // Conectar a la base de datos MongoDB Atlas
 const uri = "mongodb+srv://mancillanixon7:um8xTFnPbq9eMwnx@systemdsi.mouqdaf.mongodb.net/system_blog?retryWrites=true&w=majority";
 mongoose.connect(uri)
-.then(() => console.log('Conectado a MongoDB Atlas!'))
-.catch((error) => console.error('Error conectando a MongoDB Atlas:', error));
+    .then(() => console.log('Conectado a MongoDB Atlas!'))
+    .catch((error) => console.error('Error conectando a MongoDB Atlas:', error));
 
 
 // Definir la estructura para registrar usuario en la colección "users"
@@ -25,6 +27,10 @@ const userSchema = new mongoose.Schema({
     isStudent: { type: Boolean, required: true },
     email: { type: String, required: true, unique: true },
     password: { type: String, required: true },
+    fotoPerfil: {
+        filename: { type: String },
+        path: { type: String }
+    },
     fecha_registro: { type: Date, default: Date.now }
 });
 const User = mongoose.model('users', userSchema);
@@ -123,7 +129,8 @@ app.post('/api/users', async (req, res) => {
             phone,
             isStudent,
             email,
-            password: hashedPassword
+            password: hashedPassword,
+            fotoPerfil: { filename: null, path: null } // Inicialmente, sin foto de perfil
         });
         console.log(newUser);
         await newUser.save();
@@ -149,7 +156,8 @@ app.post('/api/login', async (req, res) => {
         }
         res.json({
             message: 'Inicio de sesión exitoso',
-            name: `${user.name} ${user.lastName}`
+            name: `${user.name} ${user.lastName}`,
+            id: user._id
         });
         console.log("Inicio de Sesion de usuario Exitoso server.js");
     } catch (error) {
