@@ -317,6 +317,24 @@ app.put('/api/likesdev/:id', async (req, res) => {
 });
 
 
+// Ruta para borrar una publicación
+app.delete('/api/borrar/publicaciones/:id', async (req, res) => {
+    try {
+        const { id } = req.params;
+        // Busca y elimina la publicación por su ID
+        const deletedPublication = await Publicacion.findByIdAndDelete(id);
+
+        if (!deletedPublication) {
+            return res.status(404).json({ message: 'Publicación no encontrada' });
+        }
+
+        res.status(200).json({ message: 'Publicación eliminada con éxito' });
+    } catch (error) {
+        console.error('Error al eliminar la publicación:', error);
+        res.status(500).json({ message: 'Error al eliminar la publicación' });
+    }
+});
+
 
 // Iniciar el servidor
 const port = process.env.PORT || 5000;
