@@ -205,7 +205,6 @@ app.post('/api/publicaciones', upload.fields([
     }
 });
 
-//para actulizar el numero de likes de publicaciones
 app.post('/api/publicaciones/:publicacionId/like', async (req, res) => {
     try {
         const { publicacionId } = req.params;
@@ -213,24 +212,39 @@ app.post('/api/publicaciones/:publicacionId/like', async (req, res) => {
 
         // Verificar si el usuario ya ha dado like a la publicación
         const existingLike = await Like.findOne({ userName, publicacionId });
+
         if (existingLike) {
-            return res.status(400).json({ error: 'Ya has dado like a esta publicación' });
+            // Si ya existe, eliminar el like
+            await Like.deleteOne({ userName, publicacionId });
+
+            // Actualizar el número de likes en la publicación
+            const publicacion = await Publicacion.findByIdAndUpdate(
+                publicacionId,
+                { $inc: { likes: -1 } }, // Decrementar el número de likes en 1
+                { new: true } // Devolver la publicación actualizada
+            );
+
+            return res.status(200).json(publicacion);
+        } else {
+            // Si no existe, crear un nuevo like
+            const newLike = new Like({ userName, publicacionId });
+            await newLike.save();
+
+            // Actualizar el número de likes en la publicación
+            const publicacion = await Publicacion.findByIdAndUpdate(
+                publicacionId,
+                { $inc: { likes: 1 } }, // Incrementar el número de likes en 1
+                { new: true } // Devolver la publicación actualizada
+            );
+
+            return res.status(200).json(publicacion);
         }
-
-        // Crear un nuevo like
-        const newLike = new Like({ userName, publicacionId });
-        await newLike.save();
-
-        // Actualizar el número de likes en la publicación
-        const publicacion = await Publicacion.findById(publicacionId);
-        publicacion.likes += 1;
-        await publicacion.save();
-
-        res.status(200).json(publicacion);
     } catch (error) {
+        console.error('Error al dar like a la publicación:', error);
         res.status(500).json({ error: 'Error al dar like a la publicación' });
     }
 });
+
 
 //ruta para obtener los likes
 app.get('/api/likes/:userName', async (req, res) => {
