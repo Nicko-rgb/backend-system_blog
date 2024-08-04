@@ -205,6 +205,7 @@ app.post('/api/publicaciones', upload.fields([
     }
 });
 
+//ruta para dar likes a la publicacion
 app.post('/api/publicaciones/:publicacionId/like', async (req, res) => {
     try {
         const { publicacionId } = req.params;
