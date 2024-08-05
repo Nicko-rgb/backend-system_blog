@@ -11,7 +11,6 @@ const { type } = require('os');
 app.use('/uploads', express.static(path.join(__dirname, 'uploads')));
 app.use('/uploads', express.static('uploads'));
 
-// Conectar a la base de datos MongoDB
 // Conectar a la base de datos MongoDB Atlas
 const uri = "mongodb+srv://mancillanixon7:um8xTFnPbq9eMwnx@systemdsi.mouqdaf.mongodb.net/system_blog?retryWrites=true&w=majority";
 mongoose.connect(uri)
@@ -124,7 +123,14 @@ app.get('/api/users/:id', async (req, res) => {
             return res.status(404).json({ message: 'Usuario no encontrado' });
         }
 
-        res.json(user);
+        // Construir la URL completa de la foto de perfil
+        const fotoPerfil = user.fotoPerfil ? {
+            filename: user.fotoPerfil.filename,
+            path: `${req.protocol}://${req.get('host')}/uploads/${user.fotoPerfil.filename}`
+        } : null;
+
+        // Enviar la respuesta con la foto de perfil
+        res.json({ ...user.toObject(), fotoPerfil });
     } catch (error) {
         console.error('Error al obtener el usuario:', error);
         res.status(500).json({ message: 'Error al obtener el usuario' });
