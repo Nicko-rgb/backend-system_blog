@@ -172,7 +172,7 @@ app.post('/api/login', async (req, res) => {
 });
 
 // Ruta para actualizar la foto de perfil
-router.post('/api/update-profile-picture/:id', upload.single('fotoPerfil'), async (req, res) => {
+app.post('/api/update-profile-picture/:id', upload.single('fotoPerfil'), async (req, res) => {
     try {
         const { id } = req.params;
         const { filename, path: filePath } = req.file; // Obtener el nombre y la ruta del archivo subido
