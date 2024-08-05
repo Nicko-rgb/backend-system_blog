@@ -114,6 +114,7 @@ app.get('/api/users', async (req, res) => {
 });
 
 // Ruta para obtener un usuario por ID
+// Ruta para obtener un usuario por ID
 app.get('/api/users/:id', async (req, res) => {
     try {
         const { id } = req.params;
@@ -126,7 +127,7 @@ app.get('/api/users/:id', async (req, res) => {
         // Construir la URL completa de la foto de perfil
         const fotoPerfil = user.fotoPerfil ? {
             filename: user.fotoPerfil.filename,
-            path: `${req.protocol}://${req.get('host')}/uploads/${user.fotoPerfil.filename}`
+            path: `${req.protocol}://backend-systemblog-production.up.railway.app/uploads/${user.fotoPerfil.filename}`
         } : null;
 
         // Enviar la respuesta con la foto de perfil
