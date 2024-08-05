@@ -158,12 +158,40 @@ app.post('/api/login', async (req, res) => {
             message: 'Inicio de sesión exitoso',
             name: `${user.name} ${user.lastName}`,
             id: user._id,
-            email: user.email
+            email: user.email,
+            fotoPerfil: {
+                filename: user.fotoPerfil.filename,
+                path: user.fotoPerfil.path
+            }
         });
         console.log("Inicio de Sesion de usuario Exitoso server.js");
     } catch (error) {
         console.error('Error al iniciar sesión:', error);
         res.status(500).json({ message: 'Error al iniciar sesión' });
+    }
+});
+
+// Ruta para actualizar la foto de perfil
+router.post('/api/update-profile-picture/:id', upload.single('fotoPerfil'), async (req, res) => {
+    try {
+        const { id } = req.params;
+        const { filename, path: filePath } = req.file; // Obtener el nombre y la ruta del archivo subido
+
+        // Actualizar el usuario en la base de datos
+        const updatedUser = await User.findByIdAndUpdate(
+            id,
+            { fotoPerfil: { filename, path: filePath } },
+            { new: true } // Devuelve el usuario actualizado
+        );
+
+        if (!updatedUser) {
+            return res.status(404).json({ message: 'Usuario no encontrado' });
+        }
+
+        res.json({ message: 'Foto de perfil actualizada', user: updatedUser });
+    } catch (error) {
+        console.error('Error al actualizar la foto de perfil:', error);
+        res.status(500).json({ message: 'Error al actualizar la foto de perfil' });
     }
 });
 
