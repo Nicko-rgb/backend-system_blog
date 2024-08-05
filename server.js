@@ -157,7 +157,8 @@ app.post('/api/login', async (req, res) => {
         res.json({
             message: 'Inicio de sesión exitoso',
             name: `${user.name} ${user.lastName}`,
-            id: user._id
+            id: user._id,
+            email: user.email
         });
         console.log("Inicio de Sesion de usuario Exitoso server.js");
     } catch (error) {
