@@ -219,15 +219,18 @@ app.post('/api/update-profile-picture/:id', upload.single('fotoPerfil'), async (
     }
 });
 
-//ruta pa obtener todas las publicaciones
+// Ruta para obtener todas las publicaciones con la foto de perfil del usuario
 app.get('/api/publicaciones', async (req, res) => {
     try {
-        const publicaciones = await Publicacion.find();
+        // Poblamos el campo userId para obtener la foto de perfil y otros datos del usuario
+        const publicaciones = await Publicacion.find().populate('userId', 'fotoPerfil name lastName');
+        
         res.json(publicaciones);
     } catch (error) {
         res.status(500).json({ message: 'Error al obtener las publicaciones' });
+        console.error("Error al obtener las publicaciones:", error);
     }
-})
+});
 
 // Ruta para guardar una nueva publicación , likes y comentarios
 app.post('/api/publicaciones', upload.fields([
