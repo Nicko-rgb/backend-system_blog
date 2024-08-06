@@ -8,8 +8,8 @@ const path = require('path');
 const { type } = require('os');
 
 // Configurar el middleware para servir archivos estáticos
-app.use('/uploads', express.static(path.join(__dirname, 'uploads')));
 app.use('/uploads', express.static('uploads'));
+app.use('/uploads', express.static(path.join(__dirname, 'uploads')));
 
 // Conectar a la base de datos MongoDB Atlas
 const uri = "mongodb+srv://mancillanixon7:um8xTFnPbq9eMwnx@systemdsi.mouqdaf.mongodb.net/system_blog?retryWrites=true&w=majority";
