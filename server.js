@@ -119,7 +119,7 @@ app.get('/api/users/:id', async (req, res) => {
     try {
         const { id } = req.params;
         const user = await User.findById(id);
-        
+
         if (!user) {
             return res.status(404).json({ message: 'Usuario no encontrado' });
         }
@@ -224,7 +224,7 @@ app.get('/api/publicaciones', async (req, res) => {
     try {
         // Poblamos el campo userId para obtener la foto de perfil y otros datos del usuario
         const publicaciones = await Publicacion.find().populate('userId', 'fotoPerfil name lastName');
-        
+
         res.json(publicaciones);
     } catch (error) {
         res.status(500).json({ message: 'Error al obtener las publicaciones' });
@@ -406,6 +406,45 @@ app.delete('/api/borrar/publicaciones/:id', async (req, res) => {
         res.status(500).json({ message: 'Error al eliminar la publicación' });
     }
 });
+
+//modelo de datos para reportes
+const reporteSchema = new mongoose.Schema({
+    publicationId: { type: mongoose.Schema.Types.ObjectId, required: true, ref: 'Publicacion' },
+    userId: { type: mongoose.Schema.Types.ObjectId, required: true, ref: 'User' },
+    reason: { type: String, required: true },
+    reportedAt: { type: Date, default: Date.now }
+});
+
+const Report = mongoose.model('Report', reporteSchema);
+
+// Ruta para reportar una publicación
+app.post('/api/publicaciones/reportar/:id', async (req, res) => {
+    const { id } = req.params;
+    const { reason, userName, reportedAt } = req.body;
+
+    try {
+        const publicacion = await Publicacion.findById(id);
+        if (!publicacion) {
+            return res.status(404).json({ message: 'Publicación no encontrada' });
+        }
+
+        // Crear un nuevo reporte
+        const reporte = new Report({
+            publicationId: id,
+            userName,
+            reason,
+            reportedAt
+        });
+
+        await reporte.save(); // Guardar el reporte en la colección
+
+        res.status(200).json({ message: 'Publicación reportada con éxito' });
+    } catch (error) {
+        res.status(500).json({ message: 'Error al reportar la publicación' });
+        console.error("Error al reportar la publicación:", error);
+    }
+});
+
 
 
 // Iniciar el servidor
