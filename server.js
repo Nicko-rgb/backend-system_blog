@@ -407,12 +407,12 @@ app.delete('/api/borrar/publicaciones/:id', async (req, res) => {
     }
 });
 
-//modelo de datos para reportes
+// Modelo de datos para reportes
 const reporteSchema = new mongoose.Schema({
-    publicationId: { type: mongoose.Schema.Types.ObjectId, required: true, ref: 'Publicacion' },
-    userId: { type: mongoose.Schema.Types.ObjectId, required: true, ref: 'User' },
-    reason: { type: String, required: true },
-    reportedAt: { type: Date, default: Date.now }
+    publicationId: { type: mongoose.Schema.Types.ObjectId, required: true, ref: 'Publicacion' }, // ID de la publicación reportada
+    reportedUserName: { type: String, required: true }, // Nombre del usuario que ha sido reportado
+    reason: { type: String, required: true }, // Motivo del reporte
+    fechaReport: { type: Date, default: Date.now } // Fecha y hora del reporte
 });
 
 const Report = mongoose.model('Report', reporteSchema);
@@ -420,7 +420,7 @@ const Report = mongoose.model('Report', reporteSchema);
 // Ruta para reportar una publicación
 app.post('/api/publicaciones/reportar/:id', async (req, res) => {
     const { id } = req.params;
-    const { reason, userName, reportedAt } = req.body;
+    const { reason, reportedUserName } = req.body; // Usar reportedUserName en lugar de userName
 
     try {
         const publicacion = await Publicacion.findById(id);
@@ -431,9 +431,8 @@ app.post('/api/publicaciones/reportar/:id', async (req, res) => {
         // Crear un nuevo reporte
         const reporte = new Report({
             publicationId: id,
-            userName,
+            reportedUserName, // Usar reportedUserName
             reason,
-            reportedAt
         });
 
         await reporte.save(); // Guardar el reporte en la colección
@@ -444,6 +443,7 @@ app.post('/api/publicaciones/reportar/:id', async (req, res) => {
         console.error("Error al reportar la publicación:", error);
     }
 });
+
 
 
 
