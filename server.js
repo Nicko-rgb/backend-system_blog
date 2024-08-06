@@ -36,7 +36,6 @@ const User = mongoose.model('users', userSchema);
 
 // Definir el modelo para registrar las publicaciones de los usuarios
 const publicationSchema = new mongoose.Schema({
-    userId: { type: mongoose.Schema.Types.ObjectId, required: true, ref: 'users' },
     userName: { type: String, required: true },
     text: { type: String },
     textArchivo: { type: String },
@@ -114,6 +113,7 @@ app.get('/api/users', async (req, res) => {
     }
 });
 
+// Ruta para obtener un usuario por ID
 // Ruta para obtener un usuario por ID
 app.get('/api/users/:id', async (req, res) => {
     try {
@@ -235,12 +235,11 @@ app.post('/api/publicaciones', upload.fields([
     { name: 'video', maxCount: 1 }
 ]), async (req, res) => {
     try {
-        const { userId, userName, text, textArchivo } = req.body;
+        const { userName, text, textArchivo } = req.body;
         const image = req.files.image ? req.files.image[0] : null;
         const video = req.files.video ? req.files.video[0] : null;
 
         const newPublicacion = new Publicacion({
-            userId,
             userName,
             text,
             textArchivo,
