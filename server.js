@@ -224,7 +224,12 @@ app.post('/api/update-profile-picture/:id', upload.single('fotoPerfil'), async (
 app.get('/api/publicaciones', async (req, res) => {
     try {
         // Poblamos el campo userId para obtener la foto de perfil y otros datos del usuario
-        const publicaciones = await Publicacion.find().populate('userId', 'fotoPerfil name lastName');
+        const publicaciones = await Publicacion.find()
+            .populate('userId', 'fotoPerfil name lastName') // Poblamos el usuario de la publicación
+            .populate({
+                path: 'comentarios.usuarioId', // Poblamos el usuario de cada comentario
+                select: 'fotoPerfil name' // Seleccionamos solo los campos necesarios
+            });
 
         res.json(publicaciones);
     } catch (error) {
@@ -232,6 +237,7 @@ app.get('/api/publicaciones', async (req, res) => {
         console.error("Error al obtener las publicaciones:", error);
     }
 });
+
 
 // Ruta para guardar una nueva publicación , likes y comentarios
 app.post('/api/publicaciones', upload.fields([
