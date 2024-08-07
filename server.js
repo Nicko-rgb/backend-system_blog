@@ -223,13 +223,8 @@ app.post('/api/update-profile-picture/:id', upload.single('fotoPerfil'), async (
 // Ruta para obtener todas las publicaciones con la foto de perfil del usuario
 app.get('/api/publicaciones', async (req, res) => {
     try {
-        
-        const publicaciones = await Publicacion.find()
-            .populate('userId', 'fotoPerfil name lastName') // Poblamos el usuario de la publicación
-            .populate({
-                path: 'comentarios.usuarioId', // Poblamos el usuario de cada comentario
-                select: 'fotoPerfil name' // Seleccionamos solo los campos necesarios
-            });
+        // Poblamos el campo userId para obtener la foto de perfil y otros datos del usuario
+        const publicaciones = await Publicacion.find().populate('userId', 'fotoPerfil name lastName');
 
         res.json(publicaciones);
     } catch (error) {
@@ -237,6 +232,8 @@ app.get('/api/publicaciones', async (req, res) => {
         console.error("Error al obtener las publicaciones:", error);
     }
 });
+
+
 
 
 // Ruta para guardar una nueva publicación , likes y comentarios
@@ -366,7 +363,6 @@ app.get('/api/publicaciones/:id', async (req, res) => {
         console.error("Error al obtener la publicación:", error);
     }
 });
-
 
 
 // Modelo de datos para cada "Me Gusta" de desarrolladores
