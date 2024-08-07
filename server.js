@@ -223,8 +223,12 @@ app.post('/api/update-profile-picture/:id', upload.single('fotoPerfil'), async (
 // Ruta para obtener todas las publicaciones con la foto de perfil del usuario
 app.get('/api/publicaciones', async (req, res) => {
     try {
-        // Poblamos el campo userId para obtener la foto de perfil y otros datos del usuario
-        const publicaciones = await Publicacion.find().populate('userId', 'fotoPerfil name lastName');
+        const publicaciones = await Publicacion.find()
+            .populate('userId', 'fotoPerfil name lastName') // Poblamos el usuario de la publicación
+            .populate({
+                path: 'comentarios.usuarioId', // Poblamos el usuario de cada comentario
+                select: 'fotoPerfil name' // Seleccionamos solo los campos necesarios
+            });
 
         res.json(publicaciones);
     } catch (error) {
@@ -232,6 +236,7 @@ app.get('/api/publicaciones', async (req, res) => {
         console.error("Error al obtener las publicaciones:", error);
     }
 });
+
 
 
 
@@ -324,7 +329,7 @@ app.get('/api/likes/:userName', async (req, res) => {
 app.post('/api/publicaciones/:publicacionId/comentar', async (req, res) => {
     try {
         const { publicacionId } = req.params;
-        const { usuarioId, usuarioName, texto } = req.body; // Cambiar 'usuario' a 'usuarioId'
+        const { usuarioId, usuarioName, texto } = req.body; // Asegúrate de recibir el ID del usuario
 
         // Buscar la publicación por su ID
         const publicacion = await Publicacion.findById(publicacionId);
@@ -340,14 +345,20 @@ app.post('/api/publicaciones/:publicacionId/comentar', async (req, res) => {
         // Guardar la publicación actualizada
         await publicacion.save();
 
-        // Obtener la publicación actualizada con los comentarios
-        const updatedPublicacion = await Publicacion.findById(publicacionId).populate('comentarios.usuarioId');
+        // Obtener la publicación actualizada con los comentarios y poblar el usuario de cada comentario
+        const updatedPublicacion = await Publicacion.findById(publicacionId)
+            .populate('userId', 'fotoPerfil name lastName') // Poblamos el usuario de la publicación
+            .populate({
+                path: 'comentarios.usuarioId', // Poblamos el usuario de cada comentario
+                select: 'fotoPerfil name' // Seleccionamos solo los campos necesarios
+            });
 
-        res.status(200).json(updatedPublicacion);
+        res.status(200).json(updatedPublicacion); // Enviar la publicación actualizada
     } catch (error) {
         res.status(500).json({ error: 'Error al enviar comentario a la publicación' });
     }
 });
+
 
 //ruta para obtener una publicacion con _id especifica
 app.get('/api/publicaciones/:id', async (req, res) => {
