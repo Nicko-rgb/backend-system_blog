@@ -60,7 +60,6 @@ const publicationSchema = new mongoose.Schema({
     comentarios: [
         {
             usuarioId: { type: mongoose.Schema.Types.ObjectId, ref: 'users', required: true },
-            usuario: { type: String, required: true }, // Cambiar de mongoose.Schema.Types.ObjectId a String
             texto: { type: String, required: true },
             fecha: { type: Date, default: Date.now }
         }
