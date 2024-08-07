@@ -289,7 +289,11 @@ app.post('/api/publicaciones/:publicacionId/like', async (req, res) => {
                 publicacionId,
                 { $inc: { likes: -1 } }, // Decrementar el número de likes en 1
                 { new: true } // Devolver la publicación actualizada
-            );
+            ).populate('userId', 'fotoPerfil name lastName') // Poblar el usuario de la publicación
+            .populate({
+                path: 'comentarios.usuarioId', // Poblar el usuario de cada comentario
+                select: 'fotoPerfil name' // Seleccionar solo los campos necesarios
+            });
 
             return res.status(200).json(publicacion);
         } else {
@@ -302,7 +306,11 @@ app.post('/api/publicaciones/:publicacionId/like', async (req, res) => {
                 publicacionId,
                 { $inc: { likes: 1 } }, // Incrementar el número de likes en 1
                 { new: true } // Devolver la publicación actualizada
-            );
+            ).populate('userId', 'fotoPerfil name lastName') // Poblar el usuario de la publicación
+            .populate({
+                path: 'comentarios.usuarioId', // Poblar el usuario de cada comentario
+                select: 'fotoPerfil name' // Seleccionar solo los campos necesarios
+            });
 
             return res.status(200).json(publicacion);
         }
@@ -311,6 +319,7 @@ app.post('/api/publicaciones/:publicacionId/like', async (req, res) => {
         res.status(500).json({ error: 'Error al dar like a la publicación' });
     }
 });
+
 
 
 //ruta para obtener los likes
