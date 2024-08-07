@@ -60,6 +60,7 @@ const publicationSchema = new mongoose.Schema({
     comentarios: [
         {
             usuarioId: { type: mongoose.Schema.Types.ObjectId, ref: 'users', required: true },
+            usuarioName: { type: String, required: true },
             texto: { type: String, required: true },
             fecha: { type: Date, default: Date.now }
         }
@@ -320,7 +321,7 @@ app.get('/api/likes/:userName', async (req, res) => {
 app.post('/api/publicaciones/:publicacionId/comentar', async (req, res) => {
     try {
         const { publicacionId } = req.params;
-        const { usuarioId, texto } = req.body; // Cambiar 'usuario' a 'usuarioId'
+        const { usuarioId, usuarioName, texto } = req.body; // Cambiar 'usuario' a 'usuarioId'
 
         // Buscar la publicación por su ID
         const publicacion = await Publicacion.findById(publicacionId);
@@ -328,6 +329,7 @@ app.post('/api/publicaciones/:publicacionId/comentar', async (req, res) => {
         // Agregar el comentario a la lista de comentarios
         publicacion.comentarios.push({
             usuarioId, // Guardar el ID del usuario que hizo el comentario
+            usuarioName,
             texto,
             fecha: new Date(),
         });
@@ -343,7 +345,7 @@ app.post('/api/publicaciones/:publicacionId/comentar', async (req, res) => {
         res.status(500).json({ error: 'Error al enviar comentario a la publicación' });
     }
 });
-
+//ruta para obtener una publicacion con _id especifica
 app.get('/api/publicaciones/:id', async (req, res) => {
     const { id } = req.params;
     try {
