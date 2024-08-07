@@ -344,6 +344,21 @@ app.post('/api/publicaciones/:publicacionId/comentar', async (req, res) => {
     }
 });
 
+app.get('/api/publicaciones/:id', async (req, res) => {
+    const { id } = req.params;
+    try {
+        const publicacion = await Publicacion.findById(id).populate('userId', 'fotoPerfil name lastName');
+        if (!publicacion) {
+            return res.status(404).json({ message: 'Publicación no encontrada' });
+        }
+        res.json(publicacion);
+    } catch (error) {
+        res.status(500).json({ message: 'Error al obtener la publicación' });
+        console.error("Error al obtener la publicación:", error);
+    }
+});
+
+
 
 // Modelo de datos para cada "Me Gusta" de desarrolladores
 const LikeDeveloperSchema = new mongoose.Schema({
