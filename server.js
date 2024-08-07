@@ -220,10 +220,29 @@ app.post('/api/update-profile-picture/:id', upload.single('fotoPerfil'), async (
 });
 
 // Ruta para obtener todas las publicaciones con la foto de perfil del usuario
+// app.get('/api/publicaciones', async (req, res) => {
+//     try {
+//         // Poblamos el campo userId para obtener la foto de perfil y otros datos del usuario
+//         const publicaciones = await Publicacion.find().populate('userId', 'fotoPerfil name lastName');
+
+//         res.json(publicaciones);
+//     } catch (error) {
+//         res.status(500).json({ message: 'Error al obtener las publicaciones' });
+//         console.error("Error al obtener las publicaciones:", error);
+//     }
+// });
+// Ruta para obtener publicaciones con paginación y la foto de perfil del usuario
 app.get('/api/publicaciones', async (req, res) => {
+    const page = parseInt(req.query.page) || 1; // Obtener el número de página de los parámetros de consulta
+    const limit = 4; // Número de publicaciones a devolver por página
+    const skip = (page - 1) * limit; // Calcular cuántas publicaciones omitir
+
     try {
         // Poblamos el campo userId para obtener la foto de perfil y otros datos del usuario
-        const publicaciones = await Publicacion.find().populate('userId', 'fotoPerfil name lastName');
+        const publicaciones = await Publicacion.find()
+            .skip(skip) // Omitir publicaciones según la página
+            .limit(limit) // Limitar el número de publicaciones devueltas
+            .populate('userId', 'fotoPerfil name lastName'); // Poblar el campo userId
 
         res.json(publicaciones);
     } catch (error) {
@@ -231,6 +250,7 @@ app.get('/api/publicaciones', async (req, res) => {
         console.error("Error al obtener las publicaciones:", error);
     }
 });
+
 
 // Ruta para guardar una nueva publicación , likes y comentarios
 app.post('/api/publicaciones', upload.fields([
