@@ -59,6 +59,7 @@ const publicationSchema = new mongoose.Schema({
     likes: { type: Number, default: 0 },
     comentarios: [
         {
+            usuarioId: { type: mongoose.Schema.Types.ObjectId, ref: 'users', required: true },
             usuario: { type: String, required: true }, // Cambiar de mongoose.Schema.Types.ObjectId a String
             texto: { type: String, required: true },
             fecha: { type: Date, default: Date.now }
@@ -320,14 +321,14 @@ app.get('/api/likes/:userName', async (req, res) => {
 app.post('/api/publicaciones/:publicacionId/comentar', async (req, res) => {
     try {
         const { publicacionId } = req.params;
-        const { usuario, texto } = req.body;
+        const { usuarioId, texto } = req.body; // Cambiar 'usuario' a 'usuarioId'
 
         // Buscar la publicación por su ID
         const publicacion = await Publicacion.findById(publicacionId);
 
         // Agregar el comentario a la lista de comentarios
         publicacion.comentarios.push({
-            usuario,
+            usuarioId, // Guardar el ID del usuario que hizo el comentario
             texto,
             fecha: new Date(),
         });
@@ -336,7 +337,7 @@ app.post('/api/publicaciones/:publicacionId/comentar', async (req, res) => {
         await publicacion.save();
 
         // Obtener la publicación actualizada con los comentarios
-        const updatedPublicacion = await Publicacion.findById(publicacionId).populate('comentarios.usuario');
+        const updatedPublicacion = await Publicacion.findById(publicacionId).populate('comentarios.usuarioId');
 
         res.status(200).json(updatedPublicacion);
     } catch (error) {
