@@ -292,7 +292,7 @@ app.post('/api/publicaciones/:publicacionId/like', async (req, res) => {
             ).populate('userId', 'fotoPerfil name lastName') // Poblar el usuario de la publicación
             .populate({
                 path: 'comentarios.usuarioId', // Poblar el usuario de cada comentario
-                select: 'fotoPerfil name' // Seleccionar solo los campos necesarios
+                select: 'fotoPerfil name lastName' // Seleccionar solo los campos necesarios
             });
 
             return res.status(200).json(publicacion);
@@ -309,7 +309,7 @@ app.post('/api/publicaciones/:publicacionId/like', async (req, res) => {
             ).populate('userId', 'fotoPerfil name lastName') // Poblar el usuario de la publicación
             .populate({
                 path: 'comentarios.usuarioId', // Poblar el usuario de cada comentario
-                select: 'fotoPerfil name' // Seleccionar solo los campos necesarios
+                select: 'fotoPerfil name lastName' // Seleccionar solo los campos necesarios
             });
 
             return res.status(200).json(publicacion);
