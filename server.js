@@ -60,7 +60,6 @@ const publicationSchema = new mongoose.Schema({
     comentarios: [
         {
             usuarioId: { type: mongoose.Schema.Types.ObjectId, ref: 'users', required: true },
-            usuarioName: { type: String, required: true },
             texto: { type: String, required: true },
             fecha: { type: Date, default: Date.now }
         }
@@ -327,7 +326,7 @@ app.get('/api/likes/:userName', async (req, res) => {
 app.post('/api/publicaciones/:publicacionId/comentar', async (req, res) => {
     try {
         const { publicacionId } = req.params;
-        const { usuarioId, usuarioName, texto } = req.body; // Cambiar 'usuario' a 'usuarioId'
+        const { usuarioId, texto } = req.body; // Asegúrate de recibir el ID del usuario
 
         // Buscar la publicación por su ID
         const publicacion = await Publicacion.findById(publicacionId);
@@ -335,7 +334,6 @@ app.post('/api/publicaciones/:publicacionId/comentar', async (req, res) => {
         // Agregar el comentario a la lista de comentarios
         publicacion.comentarios.push({
             usuarioId, // Guardar el ID del usuario que hizo el comentario
-            usuarioName,
             texto,
             fecha: new Date(),
         });
@@ -343,14 +341,20 @@ app.post('/api/publicaciones/:publicacionId/comentar', async (req, res) => {
         // Guardar la publicación actualizada
         await publicacion.save();
 
-        // Obtener la publicación actualizada con los comentarios
-        const updatedPublicacion = await Publicacion.findById(publicacionId).populate('comentarios.usuarioId');
+        // Obtener la publicación actualizada con los comentarios y poblar el usuario de cada comentario
+        const updatedPublicacion = await Publicacion.findById(publicacionId)
+            .populate('userId', 'fotoPerfil name lastName') // Poblamos el usuario de la publicación
+            .populate({
+                path: 'comentarios.usuarioId', // Poblamos el usuario de cada comentario
+                select: 'fotoPerfil name' // Seleccionamos solo los campos necesarios
+            });
 
-        res.status(200).json(updatedPublicacion);
+        res.status(200).json(updatedPublicacion); // Enviar la publicación actualizada
     } catch (error) {
         res.status(500).json({ error: 'Error al enviar comentario a la publicación' });
     }
 });
+
 
 //ruta para obtener una publicacion con _id especifica
 app.get('/api/publicaciones/:id', async (req, res) => {
