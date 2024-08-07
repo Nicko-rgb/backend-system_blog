@@ -345,6 +345,7 @@ app.post('/api/publicaciones/:publicacionId/comentar', async (req, res) => {
         res.status(500).json({ error: 'Error al enviar comentario a la publicación' });
     }
 });
+
 //ruta para obtener una publicacion con _id especifica
 app.get('/api/publicaciones/:id', async (req, res) => {
     const { id } = req.params;
